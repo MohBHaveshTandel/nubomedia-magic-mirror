@@ -4,4 +4,6 @@ MAINTAINER Nubomedia
 
 ADD . /
 
-ENTRYPOINT mvn compile exec:java
+RUN mvn compile
+
+ENTRYPOINT mvn exec:java
