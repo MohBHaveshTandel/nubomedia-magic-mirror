@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2014 Kurento (http://kurento.org/)
+ * (C) Copyright 2016 NUBOMEDIA (http://www.nubomedia.eu)
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -177,7 +177,7 @@ function sendMessage(message) {
 
 function showSpinner() {
 	for (var i = 0; i < arguments.length; i++) {
-		arguments[i].poster = './img/transparent-1px.png';
+		arguments[i].poster = './img/transparent.png';
 		arguments[i].style.background = "center transparent url('./img/spinner.gif') no-repeat";
 	}
 }

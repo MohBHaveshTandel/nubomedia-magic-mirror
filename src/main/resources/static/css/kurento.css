@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2014 Kurento (http://kurento.org/)
+ * (C) Copyright 2016 NUBOMEDIA (http://www.nubomedia.eu)
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -45,7 +45,7 @@ video, #console {
 	height: 120px;
 }
 
-.col-md-2 {
-	width: 80px;
-	padding-top: 190px;
+.col-sm-2 {
+	text-align: center;
+	margin-top: 10%;
 }

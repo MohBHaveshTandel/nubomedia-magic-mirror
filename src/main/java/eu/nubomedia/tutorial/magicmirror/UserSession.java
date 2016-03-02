@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2016 Kurento (http://kurento.org/)
+ * (C) Copyright 2016 NUBOMEDIA (http://www.nubomedia.eu)
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  */
-package org.kurento.tutorial.magicmirror;
+package eu.nubomedia.tutorial.magicmirror;
 
 import org.kurento.client.IceCandidate;
 import org.kurento.client.KurentoClient;
@@ -26,8 +26,8 @@ import com.google.gson.JsonObject;
 /**
  * User session.
  * 
- * @author Boni Garcia (bgarcia@gsyc.es)
- * @since 6.4.0
+ * @author Boni Garcia (boni.garcia@urjc.es)
+ * @since 1.0.0
  */
 public class UserSession {
 
