@@ -25,7 +25,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
  * Magic Mirror main class.
  *
  * @author Boni Garcia (bgarcia@gsyc.es)
- * @since 6.4.1
+ * @since 6.4.0
  */
 @SpringBootApplication
 @EnableWebSocket

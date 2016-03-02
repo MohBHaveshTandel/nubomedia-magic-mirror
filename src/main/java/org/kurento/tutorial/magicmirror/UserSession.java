@@ -27,7 +27,7 @@ import com.google.gson.JsonObject;
  * User session.
  * 
  * @author Boni Garcia (bgarcia@gsyc.es)
- * @since 6.4.1
+ * @since 6.4.0
  */
 public class UserSession {
 

@@ -37,7 +37,7 @@ import com.google.gson.JsonObject;
  * Magic Mirror handler (application and media logic).
  *
  * @author Boni Garcia (bgarcia@gsyc.es)
- * @since 6.4.1
+ * @since 6.4.0
  */
 public class MagicMirrorHandler extends TextWebSocketHandler {
 
