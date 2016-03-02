@@ -2,8 +2,9 @@ FROM nubomedia/apps-baseimage:src
 
 MAINTAINER Nubomedia
 
-ADD . /
+ADD keystore.jks /
+ADD . /home/nubomedia
 
-RUN mvn compile
+RUN cd /home/nubomedia && mvn compile
 
-ENTRYPOINT mvn exec:java
+ENTRYPOINT cd /home/nubomedia && mvn exec:java
