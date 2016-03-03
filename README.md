@@ -31,7 +31,9 @@ installation and development guides.
 Source
 ------
 
-Source code for other NUBOMEDIA projects can be found in the [GitHub NUBOMEDIA Group].
+Source code for other NUBOMEDIA projects can be found in the [GitHub NUBOMEDIA
+Group].
+
 
 News
 ----
@@ -41,7 +43,7 @@ Follow us on Twitter @[NUBOMEDIA Twitter].
 Issue tracker
 -------------
 
-Issues and bug reports should be posted to [GitHub Issues]
+Issues and bug reports should be posted to [GitHub Issues].
 
 Licensing and distribution
 --------------------------
@@ -67,16 +69,16 @@ with the following guidelines
 * You must specify the specific contents of your contribution either through a
   detailed bug description, through a pull-request or through a patch.
 * You must specify the licensing restrictions of the code you contribute.
-* For newly created code to be incorporated in the NUBOMEDIA code-base, you must
-  accept NUBOMEDIA to own the code copyright, so that its open source nature is
-  guaranteed.
+* For newly created code to be incorporated in the NUBOMEDIA code-base, you
+  must accept NUBOMEDIA to own the code copyright, so that its open source
+  nature is guaranteed.
 * You must justify appropriately the need and value of your contribution. The
   NUBOMEDIA project has no obligations in relation to accepting contributions
   from third parties.
 * The NUBOMEDIA project leaders have the right of asking for further
   explanations, tests or validations of any code contributed to the community
-  before it being incorporated into the NUBOMEDIA code-base. You must be ready to
-  addressing all these kind of concerns before having your code approved.
+  before it being incorporated into the NUBOMEDIA code-base. You must be ready
+  to addressing all these kind of concerns before having your code approved.
 
 Support
 -------
@@ -87,10 +89,7 @@ The NUBOMEDIA community provides support through the [NUBOMEDIA Public Mailing L
 [GitHub Issues]: https://github.com/nubomedia/nubomedia-magic-mirror/issues
 [GitHub NUBOMEDIA Group]: https://github.com/nubomedia
 [LGPL v2.1 License]: http://www.gnu.org/licenses/lgpl-2.1.html
-[NUBOMEDIA Logo]: http://www.nubomedia.eu/sites/default/files/Logo-WWW_0_0.png
+[NUBOMEDIA Logo]: http://www.nubomedia.eu/sites/default/files/nubomedia_logo-small.png
 [NUBOMEDIA Twitter]: https://twitter.com/nubomedia
 [NUBOMEDIA Public Mailing list]: https://groups.google.com/forum/#!forum/nubomedia-dev
 [NUBOMEDIA]: http://www.nubomedia.eu
-
-
-
