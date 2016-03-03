@@ -58,6 +58,10 @@ ws.onmessage = function(message) {
 			}
 		});
 		break;
+	case 'notEnoughResources':
+		stop(false);
+		$('#resourcesDialog').modal('show');
+		break;
 	default:
 		if (state == I_AM_STARTING) {
 			setState(I_CAN_START);

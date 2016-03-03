@@ -21,6 +21,7 @@ import org.kurento.client.EventListener;
 import org.kurento.client.FaceOverlayFilter;
 import org.kurento.client.OnIceCandidateEvent;
 import org.kurento.client.WebRtcEndpoint;
+import org.kurento.client.internal.NotEnoughResourcesException;
 import org.kurento.jsonrpc.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,13 +91,7 @@ public class MagicMirrorHandler extends TextWebSocketHandler {
           JsonObject response = new JsonObject();
           response.addProperty("id", "iceCandidate");
           response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
-          try {
-            synchronized (session) {
-              session.sendMessage(new TextMessage(response.toString()));
-            }
-          } catch (IOException e) {
-            log.debug(e.getMessage());
-          }
+          sendMessage(session, new TextMessage(response.toString()));
         }
       });
 
@@ -118,11 +113,13 @@ public class MagicMirrorHandler extends TextWebSocketHandler {
       response.addProperty("id", "startResponse");
       response.addProperty("sdpAnswer", sdpAnswer);
 
-      synchronized (session) {
-        session.sendMessage(new TextMessage(response.toString()));
-      }
+      sendMessage(session, new TextMessage(response.toString()));
 
       webRtcEndpoint.gatherCandidates();
+
+    } catch (NotEnoughResourcesException e) {
+      log.warn("Not enough resources", e);
+      notEnoughResources(session);
 
     } catch (Throwable t) {
       log.error("Exception starting session", t);
@@ -130,25 +127,39 @@ public class MagicMirrorHandler extends TextWebSocketHandler {
     }
   }
 
-  private void error(WebSocketSession session, String message) {
-    try {
-      // 1. Send error message to client
-      JsonObject response = new JsonObject();
-      response.addProperty("id", "error");
-      response.addProperty("message", message);
-      session.sendMessage(new TextMessage(response.toString()));
+  private void notEnoughResources(WebSocketSession session) {
+    // 1. Send notEnoughResources message to client
+    JsonObject response = new JsonObject();
+    response.addProperty("id", "notEnoughResources");
+    sendMessage(session, new TextMessage(response.toString()));
 
-      // 2. Release media session
-      release(session);
-    } catch (IOException e) {
-      log.error("Exception sending message", e);
-    }
+    // 2. Release media session
+    release(session);
+  }
+
+  private void error(WebSocketSession session, String message) {
+    // 1. Send error message to client
+    JsonObject response = new JsonObject();
+    response.addProperty("id", "error");
+    response.addProperty("message", message);
+    sendMessage(session, new TextMessage(response.toString()));
+
+    // 2. Release media session
+    release(session);
   }
 
   private void release(WebSocketSession session) {
     UserSession user = users.remove(session.getId());
     if (user != null) {
       user.release();
+    }
+  }
+
+  private synchronized void sendMessage(WebSocketSession session, TextMessage message) {
+    try {
+      session.sendMessage(message);
+    } catch (IOException e) {
+      log.error("Exception sending message", e);
     }
   }
 
