@@ -4,7 +4,6 @@
 
 	<groupId>eu.nubomedia</groupId>
 	<artifactId>nubomedia-magic-mirror</artifactId>
-	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<parent>
