@@ -40,6 +40,8 @@ public class UserSession {
 
   public UserSession(String sessionId) {
     this.sessionId = sessionId;
+
+    // One KurentoClient instance per session
     kurentoClient = KurentoClient.create();
     log.info("Created kurentoClient (session {})", sessionId);
 
