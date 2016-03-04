@@ -21,12 +21,11 @@ of service deployment, management, and exploitation allowing applications to
 transparently scale and adapt to the required load while preserving QoS
 guarantees.
 
-
 Documentation
 -------------
 
 The [NUBOMEDIA] project provides detailed documentation including tutorials,
-installation and development guides.
+installation and [Development Guide].
 
 Source
 ------
@@ -85,7 +84,7 @@ Support
 
 The NUBOMEDIA community provides support through the [NUBOMEDIA Public Mailing List].
 
-
+[Development Guide]: http://nubomedia.readthedocs.org/
 [GitHub Issues]: https://github.com/nubomedia/nubomedia-magic-mirror/issues
 [GitHub NUBOMEDIA Group]: https://github.com/nubomedia
 [LGPL v2.1 License]: http://www.gnu.org/licenses/lgpl-2.1.html
