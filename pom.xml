@@ -83,6 +83,7 @@
 
 	<build>
 		<plugins>
+			<!-- Create a runnable JAR file -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -98,6 +99,8 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- Call to bower install when compiling -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -118,6 +121,8 @@
 					<mainClass>${start-class}</mainClass>
 				</configuration>
 			</plugin>
+
+			<!-- Remove bower artifacts on mvn clean -->
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<configuration>
@@ -130,6 +135,7 @@
 			</plugin>
 		</plugins>
 
+		<!-- Filtering resources (${label}) -->
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
