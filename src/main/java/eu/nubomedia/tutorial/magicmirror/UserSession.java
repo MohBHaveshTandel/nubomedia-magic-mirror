@@ -76,8 +76,9 @@ public class UserSession {
         handler.sendMessage(session, new TextMessage(response.toString()));
       }
     });
-    webRtcEndpoint.gatherCandidates();
     String sdpAnswer = webRtcEndpoint.processOffer(sdpOffer);
+    webRtcEndpoint.gatherCandidates();
+
     return sdpAnswer;
   }
 
