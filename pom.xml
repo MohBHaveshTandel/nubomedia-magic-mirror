@@ -32,7 +32,7 @@
 		<url>https://github.com/nubomedia/nubomedia-magic-mirror</url>
 		<connection>scm:git:https://github.com/nubomedia/nubomedia-magic-mirror</connection>
 		<developerConnection>scm:git://git@github.com:nubomedia/nubomedia-magic-mirror</developerConnection>
-		<tag>develop</tag>
+		<tag>master</tag>
 	</scm>
 
 	<developers>

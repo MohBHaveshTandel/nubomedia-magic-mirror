@@ -14,12 +14,18 @@
  */
 package eu.nubomedia.tutorial.magicmirror;
 
+import org.kurento.client.EventListener;
+import org.kurento.client.FaceOverlayFilter;
 import org.kurento.client.IceCandidate;
 import org.kurento.client.KurentoClient;
 import org.kurento.client.MediaPipeline;
+import org.kurento.client.OnIceCandidateEvent;
 import org.kurento.client.WebRtcEndpoint;
+import org.kurento.jsonrpc.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
 import com.google.gson.JsonObject;
 
@@ -33,54 +39,60 @@ public class UserSession {
 
   private final Logger log = LoggerFactory.getLogger(UserSession.class);
 
+  private MagicMirrorHandler handler;
   private WebRtcEndpoint webRtcEndpoint;
   private MediaPipeline mediaPipeline;
   private KurentoClient kurentoClient;
   private String sessionId;
 
-  public UserSession(String sessionId) {
+  public UserSession(String sessionId, MagicMirrorHandler handler) {
     this.sessionId = sessionId;
+    this.handler = handler;
+  }
 
+  public String startSession(final WebSocketSession session, String sdpOffer) {
     // One KurentoClient instance per session
     kurentoClient = KurentoClient.create();
     log.info("Created kurentoClient (session {})", sessionId);
 
-    mediaPipeline = getKurentoClient().createMediaPipeline();
-    log.info("Created Media Pipeline {} (session {})", getMediaPipeline().getId(), sessionId);
+    mediaPipeline = kurentoClient.createMediaPipeline();
+    log.info("Created Media Pipeline {} (session {})", mediaPipeline.getId(), sessionId);
 
-    webRtcEndpoint = new WebRtcEndpoint.Builder(getMediaPipeline()).build();
-  }
+    // Media logic
+    webRtcEndpoint = new WebRtcEndpoint.Builder(mediaPipeline).build();
+    FaceOverlayFilter faceOverlayFilter = new FaceOverlayFilter.Builder(mediaPipeline).build();
+    faceOverlayFilter.setOverlayedImage("http://files.kurento.org/img/mario-wings.png", -0.35F,
+        -1.2F, 1.6F, 1.6F);
+    webRtcEndpoint.connect(faceOverlayFilter);
+    faceOverlayFilter.connect(webRtcEndpoint);
 
-  public WebRtcEndpoint getWebRtcEndpoint() {
-    return webRtcEndpoint;
-  }
-
-  public MediaPipeline getMediaPipeline() {
-    return mediaPipeline;
-  }
-
-  public KurentoClient getKurentoClient() {
-    return kurentoClient;
-  }
-
-  public void addCandidate(IceCandidate candidate) {
-    getWebRtcEndpoint().addIceCandidate(candidate);
+    // WebRTC negotiation
+    webRtcEndpoint.addOnIceCandidateListener(new EventListener<OnIceCandidateEvent>() {
+      @Override
+      public void onEvent(OnIceCandidateEvent event) {
+        JsonObject response = new JsonObject();
+        response.addProperty("id", "iceCandidate");
+        response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
+        handler.sendMessage(session, new TextMessage(response.toString()));
+      }
+    });
+    webRtcEndpoint.gatherCandidates();
+    String sdpAnswer = webRtcEndpoint.processOffer(sdpOffer);
+    return sdpAnswer;
   }
 
   public void addCandidate(JsonObject jsonCandidate) {
     IceCandidate candidate = new IceCandidate(jsonCandidate.get("candidate").getAsString(),
         jsonCandidate.get("sdpMid").getAsString(), jsonCandidate.get("sdpMLineIndex").getAsInt());
-    getWebRtcEndpoint().addIceCandidate(candidate);
+    webRtcEndpoint.addIceCandidate(candidate);
   }
 
   public void release() {
-    log.info("Releasing media pipeline {} (session {})", getMediaPipeline().getId(), sessionId);
-    getMediaPipeline().release();
+    log.info("Releasing media pipeline {} (session {})", mediaPipeline.getId(), sessionId);
+    mediaPipeline.release();
+
     log.info("Destroying kurentoClient (session {})", sessionId);
-    getKurentoClient().destroy();
+    kurentoClient.destroy();
   }
 
-  public String getSessionId() {
-    return sessionId;
-  }
 }

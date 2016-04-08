@@ -193,6 +193,7 @@ function hideSpinner() {
 		arguments[i].style.background = '';
 	}
 }
+
 /**
  * Lightbox utility (to display media pipeline image in a modal dialog)
  */

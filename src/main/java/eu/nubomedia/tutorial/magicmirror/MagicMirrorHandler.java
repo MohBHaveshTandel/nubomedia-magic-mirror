@@ -17,12 +17,7 @@ package eu.nubomedia.tutorial.magicmirror;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kurento.client.EventListener;
-import org.kurento.client.FaceOverlayFilter;
-import org.kurento.client.OnIceCandidateEvent;
-import org.kurento.client.WebRtcEndpoint;
 import org.kurento.client.internal.NotEnoughResourcesException;
-import org.kurento.jsonrpc.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.CloseStatus;
@@ -30,7 +25,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
@@ -42,80 +36,34 @@ import com.google.gson.JsonObject;
  */
 public class MagicMirrorHandler extends TextWebSocketHandler {
 
-  private static final Gson gson = new GsonBuilder().create();
-
   private final Logger log = LoggerFactory.getLogger(MagicMirrorHandler.class);
 
   private final ConcurrentHashMap<String, UserSession> users = new ConcurrentHashMap<>();
 
   @Override
   public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-    JsonObject jsonMessage = gson.fromJson(message.getPayload(), JsonObject.class);
-
-    log.debug("Incoming message: {}", jsonMessage);
-
-    switch (jsonMessage.get("id").getAsString()) {
-    case "start":
-      start(session, jsonMessage);
-      break;
-    case "stop": {
-      release(session);
-      break;
-    }
-    case "onIceCandidate": {
-      JsonObject jsonCandidate = jsonMessage.get("candidate").getAsJsonObject();
-      UserSession user = users.get(session.getId());
-      if (user != null) {
-        user.addCandidate(jsonCandidate);
-      }
-      break;
-    }
-    default:
-      error(session, "Invalid message with id " + jsonMessage.get("id").getAsString());
-      break;
-    }
-  }
-
-  private void start(final WebSocketSession session, JsonObject jsonMessage) {
     try {
-      // User session
-      String sessionId = session.getId();
-      UserSession user = new UserSession(sessionId);
-      users.put(sessionId, user);
-      WebRtcEndpoint webRtcEndpoint = user.getWebRtcEndpoint();
+      JsonObject jsonMessage = new GsonBuilder().create().fromJson(message.getPayload(),
+          JsonObject.class);
 
-      // ICE candidates
-      webRtcEndpoint.addOnIceCandidateListener(new EventListener<OnIceCandidateEvent>() {
-        @Override
-        public void onEvent(OnIceCandidateEvent event) {
-          JsonObject response = new JsonObject();
-          response.addProperty("id", "iceCandidate");
-          response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
-          sendMessage(session, new TextMessage(response.toString()));
-        }
-      });
+      log.info("Incoming message: {}", jsonMessage);
 
-      // Media logic
-      FaceOverlayFilter faceOverlayFilter = new FaceOverlayFilter.Builder(user.getMediaPipeline())
-          .build();
-
-      faceOverlayFilter.setOverlayedImage("http://files.kurento.org/img/mario-wings.png", -0.35F,
-          -1.2F, 1.6F, 1.6F);
-
-      webRtcEndpoint.connect(faceOverlayFilter);
-      faceOverlayFilter.connect(webRtcEndpoint);
-
-      // SDP negotiation (offer and answer)
-      String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
-      String sdpAnswer = webRtcEndpoint.processOffer(sdpOffer);
-
-      JsonObject response = new JsonObject();
-      response.addProperty("id", "startResponse");
-      response.addProperty("sdpAnswer", sdpAnswer);
-
-      sendMessage(session, new TextMessage(response.toString()));
-
-      webRtcEndpoint.gatherCandidates();
+      switch (jsonMessage.get("id").getAsString()) {
+      case "start":
+        start(session, jsonMessage);
+        break;
+      case "stop": {
+        release(session);
+        break;
+      }
+      case "onIceCandidate": {
+        onIceCandidate(session, jsonMessage);
+        break;
+      }
+      default:
+        error(session, "Invalid message with id " + jsonMessage.get("id").getAsString());
+        break;
+      }
 
     } catch (NotEnoughResourcesException e) {
       log.warn("Not enough resources", e);
@@ -127,24 +75,49 @@ public class MagicMirrorHandler extends TextWebSocketHandler {
     }
   }
 
+  private void start(final WebSocketSession session, JsonObject jsonMessage) {
+    // User session
+    String sessionId = session.getId();
+    UserSession user = new UserSession(sessionId, this);
+    users.put(sessionId, user);
+
+    // Media logic for magic mirror
+    String sdpOffer = jsonMessage.get("sdpOffer").getAsString();
+    String sdpAnswer = user.startSession(session, sdpOffer);
+
+    // Response message
+    JsonObject response = new JsonObject();
+    response.addProperty("id", "startResponse");
+    response.addProperty("sdpAnswer", sdpAnswer);
+    sendMessage(session, new TextMessage(response.toString()));
+  }
+
+  private void onIceCandidate(WebSocketSession session, JsonObject jsonMessage) {
+    JsonObject jsonCandidate = jsonMessage.get("candidate").getAsJsonObject();
+    UserSession user = users.get(session.getId());
+    if (user != null) {
+      user.addCandidate(jsonCandidate);
+    }
+  }
+
   private void notEnoughResources(WebSocketSession session) {
-    // 1. Send notEnoughResources message to client
+    // Send notEnoughResources message to client
     JsonObject response = new JsonObject();
     response.addProperty("id", "notEnoughResources");
     sendMessage(session, new TextMessage(response.toString()));
 
-    // 2. Release media session
+    // Release media session
     release(session);
   }
 
   private void error(WebSocketSession session, String message) {
-    // 1. Send error message to client
+    // Send error message to client
     JsonObject response = new JsonObject();
     response.addProperty("id", "error");
     response.addProperty("message", message);
     sendMessage(session, new TextMessage(response.toString()));
 
-    // 2. Release media session
+    // Release media session
     release(session);
   }
 
@@ -155,9 +128,11 @@ public class MagicMirrorHandler extends TextWebSocketHandler {
     }
   }
 
-  private synchronized void sendMessage(WebSocketSession session, TextMessage message) {
+  public synchronized void sendMessage(WebSocketSession session, TextMessage message) {
     try {
+      log.info("Sending message {} in session {}", message.getPayload(), session.getId());
       session.sendMessage(message);
+
     } catch (IOException e) {
       log.error("Exception sending message", e);
     }
