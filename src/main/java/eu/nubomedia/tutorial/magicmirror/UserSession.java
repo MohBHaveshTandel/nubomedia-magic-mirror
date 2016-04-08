@@ -55,10 +55,10 @@ public class UserSession {
     kurentoClient = KurentoClient.create();
     log.info("Created kurentoClient (session {})", sessionId);
 
+    // Media logic (pipeline and media elements connectivity)
     mediaPipeline = kurentoClient.createMediaPipeline();
     log.info("Created Media Pipeline {} (session {})", mediaPipeline.getId(), sessionId);
 
-    // Media logic
     webRtcEndpoint = new WebRtcEndpoint.Builder(mediaPipeline).build();
     FaceOverlayFilter faceOverlayFilter = new FaceOverlayFilter.Builder(mediaPipeline).build();
     faceOverlayFilter.setOverlayedImage("http://files.kurento.org/img/mario-wings.png", -0.35F,
