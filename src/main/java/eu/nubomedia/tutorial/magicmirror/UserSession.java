@@ -12,15 +12,14 @@
  * Lesser General Public License for more details.
  *
  */
-
 package eu.nubomedia.tutorial.magicmirror;
 
 import org.kurento.client.EventListener;
 import org.kurento.client.FaceOverlayFilter;
 import org.kurento.client.IceCandidate;
-import org.kurento.client.IceCandidateFoundEvent;
 import org.kurento.client.KurentoClient;
 import org.kurento.client.MediaPipeline;
+import org.kurento.client.OnIceCandidateEvent;
 import org.kurento.client.WebRtcEndpoint;
 import org.kurento.jsonrpc.JsonUtils;
 import org.slf4j.Logger;
@@ -68,9 +67,9 @@ public class UserSession {
     faceOverlayFilter.connect(webRtcEndpoint);
 
     // WebRTC negotiation
-    webRtcEndpoint.addIceCandidateFoundListener(new EventListener<IceCandidateFoundEvent>() {
+    webRtcEndpoint.addOnIceCandidateListener(new EventListener<OnIceCandidateEvent>() {
       @Override
-      public void onEvent(IceCandidateFoundEvent event) {
+      public void onEvent(OnIceCandidateEvent event) {
         JsonObject response = new JsonObject();
         response.addProperty("id", "iceCandidate");
         response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
