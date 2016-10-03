@@ -1,17 +1,20 @@
 /*
  * (C) Copyright 2016 NUBOMEDIA (http://www.nubomedia.eu)
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the GNU Lesser General Public License
- * (LGPL) version 2.1 which accompanies this distribution, and is available at
- * http://www.gnu.org/licenses/lgpl-2.1.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
+
 package eu.nubomedia.tutorial.magicmirror;
 
 import java.io.IOException;
@@ -43,26 +46,26 @@ public class MagicMirrorHandler extends TextWebSocketHandler {
   @Override
   public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
     try {
-      JsonObject jsonMessage = new GsonBuilder().create().fromJson(message.getPayload(),
-          JsonObject.class);
+      JsonObject jsonMessage =
+          new GsonBuilder().create().fromJson(message.getPayload(), JsonObject.class);
 
       log.info("Incoming message: {}", jsonMessage);
 
       switch (jsonMessage.get("id").getAsString()) {
-      case "start":
-        start(session, jsonMessage);
-        break;
-      case "stop": {
-        release(session);
-        break;
-      }
-      case "onIceCandidate": {
-        onIceCandidate(session, jsonMessage);
-        break;
-      }
-      default:
-        error(session, "Invalid message with id " + jsonMessage.get("id").getAsString());
-        break;
+        case "start":
+          start(session, jsonMessage);
+          break;
+        case "stop": {
+          release(session);
+          break;
+        }
+        case "onIceCandidate": {
+          onIceCandidate(session, jsonMessage);
+          break;
+        }
+        default:
+          error(session, "Invalid message with id " + jsonMessage.get("id").getAsString());
+          break;
       }
 
     } catch (NotEnoughResourcesException e) {
