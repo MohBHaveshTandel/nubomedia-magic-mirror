@@ -23,6 +23,7 @@ import org.kurento.client.IceCandidate;
 import org.kurento.client.KurentoClient;
 import org.kurento.client.MediaPipeline;
 import org.kurento.client.OnIceCandidateEvent;
+import org.kurento.client.Properties;
 import org.kurento.client.WebRtcEndpoint;
 import org.kurento.jsonrpc.JsonUtils;
 import org.slf4j.Logger;
@@ -42,6 +43,8 @@ public class UserSession {
 
   private final Logger log = LoggerFactory.getLogger(UserSession.class);
 
+  private final static int POINTS_PER_SESSION = 25;
+
   private MagicMirrorHandler handler;
   private WebRtcEndpoint webRtcEndpoint;
   private MediaPipeline mediaPipeline;
@@ -54,8 +57,10 @@ public class UserSession {
   }
 
   public String startSession(final WebSocketSession session, String sdpOffer) {
-    // One KurentoClient instance per session
-    kurentoClient = KurentoClient.create();
+    // One KurentoClient instance per session (reserving points per session)
+    Properties properties = new Properties();
+    properties.add("loadPoints", POINTS_PER_SESSION);
+    kurentoClient = KurentoClient.create(properties);
     log.info("Created kurentoClient (session {})", sessionId);
 
     // Media logic (pipeline and media elements connectivity)
