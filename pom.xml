@@ -39,7 +39,7 @@
 
 	<properties>
 		<!-- Nubomedia -->
-		<nubomedia-media-client.version>6.5.0</nubomedia-media-client.version>
+		<nubomedia-media-client.version>6.6.0</nubomedia-media-client.version>
 	</properties>
 
 	<dependencies>
